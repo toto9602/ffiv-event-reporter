@@ -1,16 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { EventCategory } from "./constants/event.category";
+import got from "got";
 
 @Injectable()
 export class EventHtmlFetcher {
   private readonly baseURL = "https://www.ff14.co.kr/news/event";
 
-  public async fetchEventsHTML() {
-    const { default: got } = await import("got"); // 동적 import 사용
-    const response = await got.get(
-      this.baseURL + `?category=${EventCategory.IN_PROGRESS}`,
-    );
-
+  public async fetchEventsHTML(): Promise<string> {
+    const response = await got(this.baseURL + "?category=1");
     console.log(response.body);
+    return response.body;
   }
 }
+// https://n8n.io/workflows/1951-scrape-and-summarize-webpages-with-ai/
