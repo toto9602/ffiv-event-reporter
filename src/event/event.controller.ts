@@ -6,18 +6,11 @@ import { EventHtmlParser } from "./crawler/event.html.parser";
 
 @Controller("/events")
 export class EventController {
-  constructor(
-    private readonly eventService: EventService,
-    private readonly fetcher: EventHtmlFetcher,
-    private readonly parser: EventHtmlParser,
-  ) {}
+  constructor(private readonly eventService: EventService) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_8PM)
   @Get()
-  public async getNewEvents(): Promise<string> {
-    const html = await this.fetcher.fetchEventsHTML();
-    this.parser.parseEvents(html);
-
-    return await this.eventService.getEvents();
+  public async getNewEvents(): Promise<void> {
+    await this.eventService.getEvents();
   }
 }
