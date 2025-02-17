@@ -13,7 +13,6 @@ export class EventHtmlFetcher {
     const response = await this.http.get({
       searchParams: { category: EventCategory.IN_PROGRESS },
     });
-    console.log(response.body);
 
     return response.body;
   }
