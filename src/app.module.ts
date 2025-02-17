@@ -1,7 +1,10 @@
 import { Module } from "@nestjs/common";
-import { EventModule } from "./event/event.module";
 import { ConfigModule } from "@nestjs/config";
 import * as path from "path";
+import { AppController } from "./app.controller";
+import { CrawlerModule } from "./crawler/crawler.module";
+import { RunnerModule } from "./runner/runner.module";
+import { AppService } from "./app.service";
 
 @Module({
   imports: [
@@ -13,7 +16,10 @@ import * as path from "path";
       ),
       isGlobal: true,
     }),
-    EventModule,
+    CrawlerModule,
+    RunnerModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
