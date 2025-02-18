@@ -12,6 +12,6 @@ export class AppService {
   public async runEventWorkflow() {
     const newEvents = await this.crawler.run();
 
-    this.runner.runReportEvents(newEvents);
+    await this.runner.runReportEvents(newEvents);
   }
 }

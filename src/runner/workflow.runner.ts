@@ -18,10 +18,11 @@ export class WorkflowRunner {
 
   public async runReportEvents(events: Event[]) {
     try {
-      const response = await this.http.post({ body: JSON.stringify(events) });
+      const response = await this.http.post<object>({
+        body: JSON.stringify(events),
+      });
 
       const eventIdList = events.map((it) => it.id);
-
       this.logger.log(
         "workflow 호출 완료, eventIdList " + eventIdList.join(","),
       );
@@ -31,7 +32,7 @@ export class WorkflowRunner {
         .transactional(async (em) => {
           await em.persistAndFlush(
             WorkflowLog.of({
-              response,
+              response: response.body,
               eventIdList: events.map((it) => it.id),
             }),
           );
