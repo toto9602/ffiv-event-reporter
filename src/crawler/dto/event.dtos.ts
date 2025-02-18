@@ -1,3 +1,5 @@
+import { Event } from "../entity/event.entity";
+
 interface EventDtoCreateArgs {
   title: string | null;
   date: string | null;
@@ -44,4 +46,26 @@ export class EventDto {
   }
 
   private static NOT_EXISTS = "N/A";
+
+  public get startDate() {
+    const [start, _] = this.date.split(" ~ ");
+    return this.parseDate(start);
+  }
+
+  public get endDate() {
+    const [_, end] = this.date.split(" ~ ");
+    return this.parseDate(end);
+  }
+
+  private parseDate(dateString: string) {
+    const [yy, mm, dd] = dateString.split("-").map(Number);
+    const fullYear = 2000 + yy;
+
+    return new Date(fullYear, mm - 1, dd);
+  }
+}
+
+export interface FilterNewEventArgs {
+  parsedEvents: EventDto[];
+  savedEvents: Event[];
 }

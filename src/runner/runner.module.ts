@@ -3,8 +3,11 @@ import { WorkflowRunner } from "./workflow.runner";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
 import { ConfigService } from "@nestjs/config";
 import got from "got";
+import { MikroOrmModule } from "@mikro-orm/nestjs";
+import { WorkflowLog } from "./entity/workflow.log.entity";
 
 @Module({
+  imports: [MikroOrmModule.forFeature([WorkflowLog])],
   providers: [
     WorkflowRunner,
     {

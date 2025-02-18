@@ -1,7 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { EventHtmlFetcher } from "./event.html.fetcher";
 import { EventHtmlParser } from "./event.html.parser";
-import { EventDto } from "./dto/event.dtos";
+import { EventDto, FilterNewEventArgs } from "./dto/event.dtos";
+import { InjectRepository } from "@mikro-orm/nestjs";
+import { Event } from "./entity/event.entity";
+import { EntityRepository, Property } from "@mikro-orm/core";
 
 @Injectable()
 export class EventCrawler {
@@ -10,32 +13,49 @@ export class EventCrawler {
   constructor(
     private readonly fetcher: EventHtmlFetcher,
     private readonly parser: EventHtmlParser,
+    @InjectRepository(Event)
+    private readonly eventRepository: EntityRepository<Event>,
   ) {}
 
-  public async run(): Promise<EventDto[]> {
+  public async run(): Promise<Event[]> {
     const eventHtml = await this.fetcher.fetchEventsHTML();
-
+    this.logger.log("HTML 조회 완료");
     const parsedEvents = this.parser.parseEvents(eventHtml);
+    this.logger.log("Event 정보 파싱 완료" + `총 ${parsedEvents.length} 건`);
 
-    const filtered = parsedEvents.filter((event) =>
-      this.isWithinOneDay(event.date),
+    const parsedEventTitles = parsedEvents.map((event) => event.title);
+    const savedEvents = await this.eventRepository.find({
+      title: { $in: parsedEventTitles },
+    });
+
+    const newEvents = this.filterNewEvents({ savedEvents, parsedEvents });
+
+    this.logger.log(`신규 이벤트 ${newEvents.length} 건 조회하여, 저장합니다`);
+    const newEventEntites = newEvents.map((event) =>
+      Event.of({
+        title: event.title,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        summary: event.summary,
+        detailLink: event.detailLink,
+        bannerUrl: event.imageUrl,
+      }),
     );
-    this.logger.log(`1일 이내 게시된 이벤트가 ${filtered.length} 건입니다`);
 
-    return filtered;
+    return await this.eventRepository
+      .getEntityManager()
+      .transactional(async (em) => {
+        await em.persistAndFlush(newEventEntites);
+        return newEventEntites;
+      });
   }
 
-  private isWithinOneDay(dateRange: string): boolean {
-    const [startDateStr] = dateRange.split(" ~ ");
+  private filterNewEvents({
+    parsedEvents,
+    savedEvents,
+  }: FilterNewEventArgs): EventDto[] {
+    const savedTitles = savedEvents.map((event) => event.title);
 
-    // 날짜 파싱 (YYYY-MM-DD 형식으로 변환)
-    const startDate = new Date(`20${startDateStr.replace(/-/g, "-")}`);
-    const today = new Date();
-
-    // UTC 기준 날짜 차이 계산
-    const diffInTime = Math.abs(today.getTime() - startDate.getTime());
-    const diffInDays = diffInTime / (1000 * 60 * 60 * 24);
-
-    return diffInDays <= 1;
+    return parsedEvents.filter((event) => !savedTitles.includes(event.title));
   }
 }

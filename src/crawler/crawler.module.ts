@@ -7,8 +7,11 @@ import { EventHtmlParser } from "./event.html.parser";
 import got from "got";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
 import { EventCrawler } from "./event.crawler";
+import { MikroOrmModule } from "@mikro-orm/nestjs";
+import { Event } from "./entity/event.entity";
 
 @Module({
+  imports: [MikroOrmModule.forFeature([Event])],
   providers: [
     EventCrawler,
     EventHtmlFetcher,

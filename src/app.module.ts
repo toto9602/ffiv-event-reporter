@@ -5,6 +5,7 @@ import { AppController } from "./app.controller";
 import { CrawlerModule } from "./crawler/crawler.module";
 import { RunnerModule } from "./runner/runner.module";
 import { AppService } from "./app.service";
+import { getMikroOrmModule } from "./common/database/getMikroOrmModule";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AppService } from "./app.service";
       ),
       isGlobal: true,
     }),
+    getMikroOrmModule(),
     CrawlerModule,
     RunnerModule,
   ],
