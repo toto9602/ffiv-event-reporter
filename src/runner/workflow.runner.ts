@@ -17,6 +17,13 @@ export class WorkflowRunner {
   ) {}
 
   public async runReportEvents(events: Event[]) {
+    if (events.length === 0) {
+      this.logger.log(
+        "신규 조회된 이벤트가 없어 workflow를 호출하지 않습니다...",
+      );
+      return;
+    }
+
     try {
       const response = await this.http.post<object>({
         body: JSON.stringify(events),
