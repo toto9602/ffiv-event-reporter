@@ -6,7 +6,7 @@ import { AppService } from "./app.service";
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   @Get()
   public async runEventWorklow() {
     await this.appService.runEventWorkflow();

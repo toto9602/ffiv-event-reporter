@@ -4,7 +4,12 @@ import { EventHtmlParser } from "./event.html.parser";
 import { EventDto, FilterNewEventArgs } from "./dto/event.dtos";
 import { InjectRepository } from "@mikro-orm/nestjs";
 import { Event } from "./entity/event.entity";
-import { EntityRepository, Property } from "@mikro-orm/core";
+import {
+  CreateRequestContext,
+  EntityRepository,
+  MikroORM,
+  Property,
+} from "@mikro-orm/core";
 
 @Injectable()
 export class EventCrawler {
@@ -13,10 +18,12 @@ export class EventCrawler {
   constructor(
     private readonly fetcher: EventHtmlFetcher,
     private readonly parser: EventHtmlParser,
+    private readonly orm: MikroORM,
     @InjectRepository(Event)
     private readonly eventRepository: EntityRepository<Event>,
   ) {}
 
+  @CreateRequestContext()
   public async run(): Promise<Event[]> {
     const eventHtml = await this.fetcher.fetchEventsHTML();
     this.logger.log("HTML 조회 완료");

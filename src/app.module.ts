@@ -6,6 +6,7 @@ import { CrawlerModule } from "./crawler/crawler.module";
 import { RunnerModule } from "./runner/runner.module";
 import { AppService } from "./app.service";
 import { getMikroOrmModule } from "./common/database/getMikroOrmModule";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { getMikroOrmModule } from "./common/database/getMikroOrmModule";
     getMikroOrmModule(),
     CrawlerModule,
     RunnerModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
