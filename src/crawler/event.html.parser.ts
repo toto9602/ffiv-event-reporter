@@ -28,7 +28,7 @@ export class EventHtmlParser {
           .css("background-image");
 
         const imageUrl = bannerImage
-          ? "https://" + bannerImage.replace(/url\(['"]?(.*?)['"]?\)/, "$1")
+          ? "https:" + bannerImage.replace(/url\(['"]?(.*?)['"]?\)/, "$1")
           : null;
 
         return EventDto.of({ title, date, summary, detailLink, imageUrl });
