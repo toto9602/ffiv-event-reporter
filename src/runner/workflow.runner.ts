@@ -25,9 +25,12 @@ export class WorkflowRunner {
     }
 
     try {
-      const response = await this.http.post<object>({
-        body: JSON.stringify(events),
-      });
+      const responsePromises = events.map((event) =>
+        this.http.post("", {
+          json: event,
+        }),
+      );
+      const responseList = await Promise.all(responsePromises);
 
       const eventIdList = events.map((it) => it.id);
       this.logger.log(
@@ -39,7 +42,7 @@ export class WorkflowRunner {
         .transactional(async (em) => {
           await em.persistAndFlush(
             WorkflowLog.of({
-              response: response.body,
+              response: JSON.parse(responseList[0].body),
               eventIdList: events.map((it) => it.id),
             }),
           );
