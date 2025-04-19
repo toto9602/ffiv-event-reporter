@@ -4,12 +4,7 @@ import { EventHtmlParser } from "./event.html.parser";
 import { EventDto, FilterNewEventArgs } from "./dto/event.dtos";
 import { InjectRepository } from "@mikro-orm/nestjs";
 import { Event } from "./entity/event.entity";
-import {
-  CreateRequestContext,
-  EntityRepository,
-  MikroORM,
-  Property,
-} from "@mikro-orm/core";
+import { CreateRequestContext, EntityRepository } from "@mikro-orm/core";
 
 @Injectable()
 export class EventCrawler {

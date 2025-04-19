@@ -4,7 +4,7 @@ import { Event } from "../crawler/entity/event.entity";
 import { InjectRepository } from "@mikro-orm/nestjs";
 import { WorkflowLog } from "./entity/workflow.log.entity";
 import { EntityRepository } from "@mikro-orm/core";
-import { AxiosInstance } from "axios";
+import type { AxiosInstance } from "axios";
 
 @Injectable()
 export class WorkflowRunner {

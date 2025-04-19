@@ -4,7 +4,6 @@ import { EventHtmlFetcher } from "./event.html.fetcher";
 //https://github.com/lokalise/node-lokalise-api/issues/405
 import { EventHtmlParser } from "./event.html.parser";
 
-import got from "got";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
 import { EventCrawler } from "./event.crawler";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
