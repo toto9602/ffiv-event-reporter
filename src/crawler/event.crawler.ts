@@ -18,7 +18,6 @@ export class EventCrawler {
   constructor(
     private readonly fetcher: EventHtmlFetcher,
     private readonly parser: EventHtmlParser,
-    private readonly orm: MikroORM,
     @InjectRepository(Event)
     private readonly eventRepository: EntityRepository<Event>,
   ) {}

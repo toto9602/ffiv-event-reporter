@@ -1,17 +1,18 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { Got } from "got";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
 import { Event } from "../crawler/entity/event.entity";
 import { InjectRepository } from "@mikro-orm/nestjs";
 import { WorkflowLog } from "./entity/workflow.log.entity";
 import { EntityRepository } from "@mikro-orm/core";
+import { AxiosInstance } from "axios";
 
 @Injectable()
 export class WorkflowRunner {
   private readonly logger = new Logger(WorkflowRunner.name);
 
   constructor(
-    @Inject(DI_SYMBOLS.WORKFLOW_HTTP_INSTANCE) private readonly http: Got,
+    @Inject(DI_SYMBOLS.WORKFLOW_HTTP_INSTANCE)
+    private readonly http: AxiosInstance,
     @InjectRepository(WorkflowLog)
     private readonly workflowLogRepository: EntityRepository<WorkflowLog>,
   ) {}
@@ -42,7 +43,7 @@ export class WorkflowRunner {
         .transactional(async (em) => {
           await em.persistAndFlush(
             WorkflowLog.of({
-              response: JSON.parse(responseList[0].body),
+              response: JSON.parse(responseList[0].data),
               eventIdList: events.map((it) => it.id),
             }),
           );
