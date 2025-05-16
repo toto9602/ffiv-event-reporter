@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { Got } from "got";
 import { EventCategory } from "./constants/event.category";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
+import { Got } from "got";
 
 @Injectable()
 export class EventHtmlFetcher {
