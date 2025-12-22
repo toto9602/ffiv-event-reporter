@@ -13,7 +13,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     ConfigModule.forRoot({
       envFilePath: path.join(
         __dirname,
-        "../env",
+        "../../env",
         `.${process.env.NODE_ENV}.env`,
       ),
       isGlobal: true,
