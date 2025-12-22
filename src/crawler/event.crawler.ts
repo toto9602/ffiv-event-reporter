@@ -62,7 +62,12 @@ export class EventCrawler {
     savedEvents,
   }: FilterNewEventArgs): EventDto[] {
     const savedTitles = savedEvents.map((event) => event.title);
+    const savedDescriptions = savedEvents.map((event) => event.summary);
 
-    return parsedEvents.filter((event) => !savedTitles.includes(event.title));
+    return parsedEvents.filter(
+      (event) =>
+        !savedTitles.includes(event.title) &&
+        !savedDescriptions.includes(event.summary),
+    );
   }
 }
