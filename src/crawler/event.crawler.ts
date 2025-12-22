@@ -66,7 +66,7 @@ export class EventCrawler {
 
     return parsedEvents.filter(
       (event) =>
-        !savedTitles.includes(event.title) &&
+        !savedTitles.includes(event.title) ||
         !savedDescriptions.includes(event.summary),
     );
   }
