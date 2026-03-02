@@ -8,7 +8,22 @@ export class AppController {
 
   @Cron(CronExpression.EVERY_MINUTE)
   @Get()
-  public async runEventWorklow() {
-    await this.appService.runEventWorkflow();
+  public async fetchNewEvents() {
+    await this.appService.fetchNewEvents();
+  }
+
+  @Cron("*/10 * * * *") // :00, :10, :20 ...
+  public async runEventDetailCrawl() {
+    await this.appService.runEventDetailCrawl();
+  }
+
+  @Cron("2-59/10 * * * *") // :02, :12, :22 ...
+  public async parseEventDetails() {
+    await this.appService.parseEventDetails();
+  }
+
+  @Cron("4-59/10 * * * *") // :04, :14, :24 ...
+  public async runReportEvents() {
+    await this.appService.runReportEvents();
   }
 }

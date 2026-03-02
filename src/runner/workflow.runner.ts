@@ -1,10 +1,8 @@
-import { Inject, Injectable, Logger } from "@nestjs/common";
-import { Got } from "got";
-import { DI_SYMBOLS } from "../common/constants/di-symbols";
+import { Injectable, Logger } from "@nestjs/common";
 import { Event } from "../crawler/entity/event.entity";
 import { InjectRepository } from "@mikro-orm/nestjs";
 import { WorkflowLog } from "./entity/workflow.log.entity";
-import { EntityRepository } from "@mikro-orm/core";
+import { CreateRequestContext, EntityRepository, MikroORM } from "@mikro-orm/core";
 import axios from "axios";
 
 @Injectable()
@@ -16,28 +14,29 @@ export class WorkflowRunner {
   });
 
   constructor(
+    private readonly orm: MikroORM,
     @InjectRepository(WorkflowLog)
     private readonly workflowLogRepository: EntityRepository<WorkflowLog>,
+    @InjectRepository(Event)
+    private readonly eventRepository: EntityRepository<Event>,
   ) {}
 
-  public async runReportEvents(events: Event[]) {
+  @CreateRequestContext()
+  public async runReportEvents() {
+    const events = await this.eventRepository.find({ notifiedAt: null });
+
     if (events.length === 0) {
-      this.logger.log(
-        "신규 조회된 이벤트가 없어 workflow를 호출하지 않습니다...",
-      );
+      this.logger.log("미발송 이벤트가 없어 workflow를 호출하지 않습니다...");
       return;
     }
 
-    try {
-      events.forEach(async (it) => {
+    this.logger.log(`미발송 이벤트 ${events.length}건 workflow 호출 시작`);
+
+    for (const event of events) {
+      try {
         const response = await this.axiosInstanace.post(
           "/eb9070c7-f905-48b6-ae0f-6fdb39d86337",
-          { ...it },
-        );
-
-        const eventIdList = events.map((it) => it.id);
-        this.logger.log(
-          "workflow 호출 완료, eventIdList " + eventIdList.join(","),
+          { ...event },
         );
 
         await this.workflowLogRepository
@@ -46,13 +45,16 @@ export class WorkflowRunner {
             await em.persistAndFlush(
               WorkflowLog.of({
                 response: response.data,
-                eventIdList: events.map((it) => it.id),
+                eventIdList: [event.id],
               }),
             );
+            event.notifiedAt = new Date();
           });
-      });
-    } catch (e: any) {
-      this.logger.error("Workflow 호출 중 오류 발생", e);
+
+        this.logger.log(`workflow 호출 완료, eventId: ${event.id}`);
+      } catch (e: any) {
+        this.logger.error(`workflow 호출 실패, eventId: ${event.id}`, e);
+      }
     }
   }
 }

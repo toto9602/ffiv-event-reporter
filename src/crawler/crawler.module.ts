@@ -9,13 +9,17 @@ import { DI_SYMBOLS } from "../common/constants/di-symbols";
 import { EventCrawler } from "./event.crawler";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { Event } from "./entity/event.entity";
+import { EventDetail } from "./entity/event.detail.entity";
+import { EventDetailCrawler } from "./event.detail.crawler";
+import { RendererModule } from "../renderer/renderer.module";
 
 @Module({
-  imports: [MikroOrmModule.forFeature([Event])],
+  imports: [MikroOrmModule.forFeature([Event, EventDetail]), RendererModule],
   providers: [
     EventCrawler,
     EventHtmlFetcher,
     EventHtmlParser,
+    EventDetailCrawler,
     {
       provide: DI_SYMBOLS.EVENT_HTTP_INSTANCE,
       useFactory: () =>
@@ -24,6 +28,6 @@ import { Event } from "./entity/event.entity";
         }),
     },
   ],
-  exports: [EventCrawler],
+  exports: [EventCrawler, EventDetailCrawler],
 })
 export class CrawlerModule {}
