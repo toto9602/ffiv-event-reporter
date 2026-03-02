@@ -6,9 +6,6 @@ import { FeaturedReward } from "../../parser/dto/featured.reward";
 interface CreateEventDetailArgs {
   event: Event;
   rawText: string;
-  eventStartedAt?: Date | null;
-  eventEndedAt?: Date | null;
-  featuredRewards?: FeaturedReward[] | null;
 }
 
 @Entity({ tableName: "event_detail" })
@@ -33,11 +30,25 @@ export class EventDetail extends BaseEntity {
 
   public static of(args: CreateEventDetailArgs): EventDetail {
     const entity = new EventDetail();
+
     entity.event = args.event;
     entity.rawText = args.rawText;
-    entity.eventStartedAt = args.eventStartedAt ?? null;
-    entity.eventEndedAt = args.eventEndedAt ?? null;
-    entity.featuredRewards = args.featuredRewards ?? null;
+    entity.eventStartedAt = null;
+    entity.eventEndedAt = null;
+    entity.featuredRewards = null;
+
     return entity;
+  }
+
+  public updateParsedDate(
+    eventStartedAt: Date | null,
+    eventEndedAt: Date | null,
+    featuredRewards: FeaturedReward[] | null,
+  ): void {
+    this.eventStartedAt = eventStartedAt;
+    this.eventEndedAt = eventEndedAt;
+    this.featuredRewards = featuredRewards;
+
+    this.parsedAt = new Date();
   }
 }

@@ -1,6 +1,10 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@mikro-orm/nestjs";
-import { CreateRequestContext, EntityRepository, MikroORM } from "@mikro-orm/core";
+import {
+  CreateRequestContext,
+  EntityRepository,
+  MikroORM,
+} from "@mikro-orm/core";
 import { EventDetail } from "../crawler/entity/event.detail.entity";
 import { EventDetailExtractor } from "./event.detail.extractor.interface";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
@@ -28,10 +32,11 @@ export class EventContentParser {
       try {
         const parsed = await this.llmExtractor.extract(detail.rawText);
 
-        detail.eventStartedAt = parsed.eventStartedAt;
-        detail.eventEndedAt = parsed.eventEndedAt;
-        detail.featuredRewards = parsed.featuredRewards;
-        detail.parsedAt = new Date();
+        detail.updateParsedDate(
+          parsed.eventStartedAt,
+          parsed.eventEndedAt,
+          parsed.featuredRewards,
+        );
 
         await this.eventDetailRepository.getEntityManager().flush();
         this.logger.log(`파싱 완료: eventDetailId ${detail.id}`);

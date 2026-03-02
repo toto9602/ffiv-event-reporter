@@ -29,18 +29,23 @@ export class EventDetailCrawler {
     const pendingEvents = await this.eventRepository.find({
       detailCrawledAt: null,
     });
+
     this.logger.log(`상세 미수집 이벤트 ${pendingEvents.length}건 처리 시작`);
 
     for (const event of pendingEvents) {
       try {
         const html = await this.renderer.render(event.detailLink);
         const rawText = await this.extractor.extract(html);
+
         const detail = EventDetail.of({ event, rawText });
-        event.detailCrawledAt = new Date();
+
         await this.eventDetailRepository
           .getEntityManager()
           .transactional(async (em) => {
-            em.persist(detail);
+            await em.persist(detail).flush();
+
+            event.updateDetailCrawledAt(new Date());
+            await em.persist(event).flush();
           });
         this.logger.log(`이벤트 상세 저장 완료: ${event.title}`);
       } catch (err) {

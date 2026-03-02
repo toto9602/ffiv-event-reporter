@@ -48,4 +48,8 @@ export class Event extends BaseEntity {
 
     return entity;
   }
+
+  public updateDetailCrawledAt(date: Date): void {
+    this.detailCrawledAt = date;
+  }
 }

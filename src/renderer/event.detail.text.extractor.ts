@@ -1,6 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import * as cheerio from "cheerio";
-import { createWorker } from "tesseract.js";
 
 const BASE_URL = "https://www.ff14.co.kr";
 
