@@ -8,7 +8,6 @@ import {
   CreateRequestContext,
   EntityRepository,
   MikroORM,
-  Property,
 } from "@mikro-orm/core";
 
 @Injectable()

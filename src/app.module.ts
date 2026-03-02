@@ -4,6 +4,7 @@ import * as path from "path";
 import { AppController } from "./app.controller";
 import { CrawlerModule } from "./crawler/crawler.module";
 import { RunnerModule } from "./runner/runner.module";
+import { ParserModule } from "./parser/parser.module";
 import { AppService } from "./app.service";
 import { getMikroOrmModule } from "./common/database/getMikroOrmModule";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -21,6 +22,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     getMikroOrmModule(),
     CrawlerModule,
     RunnerModule,
+    ParserModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController],

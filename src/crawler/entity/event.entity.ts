@@ -30,6 +30,12 @@ export class Event extends BaseEntity {
   @Property({ type: "varchar", name: "banner_url" })
   bannerUrl: string;
 
+  @Property({ type: "datetime", name: "detail_crawled_at", nullable: true })
+  detailCrawledAt: Date | null = null;
+
+  @Property({ type: "datetime", name: "notified_at", nullable: true })
+  notifiedAt: Date | null = null;
+
   public static of(args: CreateEventArgs): Event {
     const entity = new Event();
 
@@ -41,5 +47,9 @@ export class Event extends BaseEntity {
     entity.bannerUrl = args.bannerUrl;
 
     return entity;
+  }
+
+  public updateDetailCrawledAt(date: Date): void {
+    this.detailCrawledAt = date;
   }
 }
