@@ -1,16 +1,17 @@
 import { BaseEntity } from "../../common/database/base.entity";
 import { Entity, ManyToOne, Property } from "@mikro-orm/core";
 import { Event } from "./event.entity";
+import { FeaturedReward } from "../../parser/dto/featured.reward";
 
 interface CreateEventDetailArgs {
   event: Event;
   rawText: string;
   eventStartedAt?: Date | null;
   eventEndedAt?: Date | null;
-  featuredRewards?: string | null;
+  featuredRewards?: FeaturedReward[] | null;
 }
 
-@Entity({ tableName: "event_details" })
+@Entity({ tableName: "event_detail" })
 export class EventDetail extends BaseEntity {
   @ManyToOne(() => Event, { name: "event_id" })
   event: Event;
@@ -24,8 +25,8 @@ export class EventDetail extends BaseEntity {
   @Property({ type: "datetime", name: "event_ended_at", nullable: true })
   eventEndedAt: Date | null;
 
-  @Property({ type: "text", name: "featured_rewards", nullable: true })
-  featuredRewards: string | null;
+  @Property({ type: "json", name: "featured_rewards", nullable: true })
+  featuredRewards: FeaturedReward[] | null;
 
   @Property({ type: "datetime", name: "parsed_at", nullable: true })
   parsedAt: Date | null = null;

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
 import { EventDetailExtractor } from "./event.detail.extractor.interface";
 import { ParsedEventContent } from "./dto/parsed.event.content";
+import { FeaturedReward } from "./dto/featured.reward";
 
 @Injectable()
 export class EventDetailOpenAiExtractor implements EventDetailExtractor {
@@ -28,7 +29,15 @@ export class EventDetailOpenAiExtractor implements EventDetailExtractor {
         "Event end datetime in ISO 8601 format (e.g. 2024-01-15T10:00:00+09:00), or null if not found",
       ),
     featured_rewards: z
-      .array(z.string())
+      .array(
+        z.object({
+          title: z.string().describe("Reward item title"),
+          image_url: z
+            .string()
+            .nullable()
+            .describe("Reward item image URL, or null if not found"),
+        }),
+      )
       .max(5)
       .describe("List of featured rewards (up to 5 items)"),
   });
@@ -78,7 +87,12 @@ export class EventDetailOpenAiExtractor implements EventDetailExtractor {
         : null,
       featuredRewards:
         parsed.featured_rewards.length > 0
-          ? parsed.featured_rewards.join("\n")
+          ? parsed.featured_rewards.map(
+              (r): FeaturedReward => ({
+                title: r.title,
+                imageUrl: r.image_url,
+              }),
+            )
           : null,
     };
   }

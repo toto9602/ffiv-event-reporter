@@ -1,5 +1,7 @@
+import { FeaturedReward } from "./featured.reward";
+
 export interface ParsedEventContent {
   eventStartedAt: Date | null;
   eventEndedAt: Date | null;
-  featuredRewards: string | null;
+  featuredRewards: FeaturedReward[] | null;
 }
