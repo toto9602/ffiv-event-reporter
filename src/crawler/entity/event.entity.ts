@@ -57,6 +57,7 @@ export class Event extends BaseEntity {
     entity.summary = args.summary;
     entity.detailLink = args.detailLink;
     entity.bannerUrl = args.bannerUrl;
+    entity.dateParseStatus = DateParseStatus.NOT_PARSED;
 
     return entity;
   }
