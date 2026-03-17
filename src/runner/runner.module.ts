@@ -5,9 +5,12 @@ import { ConfigService } from "@nestjs/config";
 import got from "got";
 import { MikroOrmModule } from "@mikro-orm/nestjs";
 import { WorkflowLog } from "./entity/workflow.log.entity";
+import { MessageHistory } from "./entity/message.history.entity";
+import { MessageReplyHistory } from "./entity/message.reply.history.entity";
+import { Event } from "../crawler/entity/event.entity";
 
 @Module({
-  imports: [MikroOrmModule.forFeature([WorkflowLog])],
+  imports: [MikroOrmModule.forFeature([WorkflowLog, MessageHistory, MessageReplyHistory, Event])],
   providers: [
     WorkflowRunner,
     {

@@ -11,4 +11,18 @@ export class AppController {
   public async runEventWorklow() {
     await this.appService.runEventWorkflow();
   }
+
+  public async updateEventPeriods() {
+    await this.appService.updateEventPeriods();
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  public async runReportEventsWithPeriods() {
+    await this.appService.runReportEventsWithPeriods();
+  }
+
+  @Cron("0 0 * * *")
+  public async sendEventStartReminders() {
+    await this.appService.sendEventStartReminders();
+  }
 }

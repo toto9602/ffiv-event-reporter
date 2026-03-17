@@ -5,7 +5,7 @@ import {
   EntityRepository,
   MikroORM,
 } from "@mikro-orm/core";
-import { Event } from "../crawler/entity/event.entity";
+import { DateParseStatus, Event } from "../crawler/entity/event.entity";
 import { EventDetailRenderer } from "./renderer/event.detail.renderer";
 import { EventDetailTextExtractor } from "./text-extractor/event.detail.text.extractor";
 import { EventDateParser } from "./date-parser/date.parser.interface";
@@ -25,13 +25,14 @@ export class EventDateUpdater {
     @Inject(DI_SYMBOLS.EVENT_DATE_PARSER)
     private readonly dateParser: EventDateParser,
     @InjectRepository(WorkflowLog)
-    private readonly workflowLogRepository: EntityRepository<WorkflowLog>,
   ) {}
 
   @CreateRequestContext()
   public async run(): Promise<void> {
     const events = await this.eventRepository.find({
       eventStartedAt: null,
+      eventEndedAt: null,
+      dateParseStatus: DateParseStatus.NOT_PARSED,
     });
 
     this.logger.log(`날짜 업데이트 대상 이벤트 ${events.length}건`);
