@@ -18,11 +18,13 @@ export class AppController {
   }
 
   // @Cron(CronExpression.EVERY_MINUTE)
+  @Post("/report-new-events")
   public async runReportEventsWithPeriods() {
     await this.appService.reportNewEvents();
   }
 
   // @Cron("0 0 * * *")
+  @Post("/event-remind")
   public async sendEventStartReminders() {
     await this.appService.sendEventStartReminders();
   }
