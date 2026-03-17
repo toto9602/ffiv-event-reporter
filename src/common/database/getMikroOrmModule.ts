@@ -11,7 +11,7 @@ export function getMikroOrmModule() {
   return MikroOrmModule.forRoot({
     entities: isProd
       ? [path.join(__dirname, "../../**/entity/*.entity.js")]
-      : [],
+      : [path.join(__dirname, "../../**/entity/*.entity.js")],
     entitiesTs: isProd
       ? []
       : [path.join(__dirname, "../../**/entity/*.entity.ts")],

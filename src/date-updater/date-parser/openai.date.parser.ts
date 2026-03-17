@@ -6,6 +6,7 @@ import { z } from "zod";
 import { EventDateParser } from "./date.parser.interface";
 import { DI_SYMBOLS } from "../../common/constants/di-symbols";
 import { ParsedEventDate } from "./dto/parsed.event.date";
+import { SYSTEM_PROMPT } from "./prompts/system.prompt";
 
 @Injectable()
 export class OpenAiEventDateParser implements EventDateParser {
