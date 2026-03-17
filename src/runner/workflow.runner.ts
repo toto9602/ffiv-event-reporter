@@ -7,19 +7,16 @@ import { WorkflowLog } from "./entity/workflow.log.entity";
 import { MessageHistory } from "./entity/message.history.entity";
 import { MessageReplyHistory } from "./entity/message.reply.history.entity";
 import { EntityRepository } from "@mikro-orm/core";
-import axios from "axios";
+import { AxiosInstance } from "axios";
 
 @Injectable()
 export class WorkflowRunner {
   private readonly logger = new Logger(WorkflowRunner.name);
 
-  private readonly axiosInstance = axios.create({
-    baseURL: "https://toto9602.app.n8n.cloud/webhook",
-  });
+  private readonly newEventEndpoint: string;
+  private readonly eventReplyEndpoint: string;
 
   constructor(
-    @InjectRepository(WorkflowLog)
-    private readonly workflowLogRepository: EntityRepository<WorkflowLog>,
     @InjectRepository(MessageHistory)
     private readonly messageHistoryRepository: EntityRepository<MessageHistory>,
     @InjectRepository(MessageReplyHistory)
@@ -27,45 +24,14 @@ export class WorkflowRunner {
     @InjectRepository(Event)
     private readonly eventRepository: EntityRepository<Event>,
     private readonly config: ConfigService,
-  ) {}
-
-  public async runReportEvents(events: Event[]) {
-    if (events.length === 0) {
-      this.logger.log(
-        "신규 조회된 이벤트가 없어 workflow를 호출하지 않습니다...",
-      );
-      return;
-    }
-
-    try {
-      events.forEach(async (it) => {
-        const response = await this.axiosInstance.post(
-          "/eb9070c7-f905-48b6-ae0f-6fdb39d86337",
-          { ...it },
-        );
-
-        const eventIdList = events.map((it) => it.id);
-        this.logger.log(
-          "workflow 호출 완료, eventIdList " + eventIdList.join(","),
-        );
-
-        await this.workflowLogRepository
-          .getEntityManager()
-          .transactional(async (em) => {
-            await em.persistAndFlush(
-              WorkflowLog.of({
-                response: response.data,
-                eventIdList: events.map((it) => it.id),
-              }),
-            );
-          });
-      });
-    } catch (e: any) {
-      this.logger.error("Workflow 호출 중 오류 발생", e);
-    }
+    @Inject(DI_SYMBOLS.WORKFLOW_HTTP_INSTANCE)
+    private readonly axiosInstance: AxiosInstance,
+  ) {
+    this.newEventEndpoint = this.config.getOrThrow("NEW_EVENT_ENDPOINT");
+    this.eventReplyEndpoint = this.config.getOrThrow("EVENT_REPLY_ENDPOINT");
   }
 
-  public async runForEventsWithPeriods(): Promise<void> {
+  public async reportNewEvents(): Promise<void> {
     const events = await this.eventRepository.find({
       eventStartedAt: { $ne: null },
       eventEndedAt: { $ne: null },
@@ -79,10 +45,9 @@ export class WorkflowRunner {
 
     for (const event of events) {
       try {
-        const response = await this.axiosInstance.post(
-          "/eb9070c7-f905-48b6-ae0f-6fdb39d86337",
-          { ...event },
-        );
+        const response = await this.axiosInstance.post(this.newEventEndpoint, {
+          ...event,
+        });
 
         const messageId: string =
           response.data?.messageId ?? String(response.data?.id ?? "");
@@ -134,8 +99,6 @@ export class WorkflowRunner {
       return;
     }
 
-    const reminderWebhookPath = this.config.getOrThrow("REMINDER_WEBHOOK_PATH");
-
     for (const event of todayEvents) {
       const history = await this.messageHistoryRepository.findOne({
         eventId: event.id,
@@ -149,10 +112,13 @@ export class WorkflowRunner {
       }
 
       try {
-        const response = await this.axiosInstance.post(reminderWebhookPath, {
-          messageId: history.externalMessageID,
-          event: { ...event },
-        });
+        const response = await this.axiosInstance.post(
+          this.eventReplyEndpoint,
+          {
+            messageId: history.externalMessageID,
+            event: { ...event },
+          },
+        );
 
         const replyMessageId: string =
           response.data?.messageId ?? String(response.data?.id ?? "");
@@ -160,14 +126,18 @@ export class WorkflowRunner {
         await this.messageReplyHistoryRepository
           .getEntityManager()
           .transactional(async (em) => {
-            await em.persistAndFlush(
+            await em.persistAndFlush([
               MessageReplyHistory.of({
                 sentAt: new Date(),
                 eventId: event.id,
                 originalMessageId: history.externalMessageID,
                 replyMessageId,
               }),
-            );
+              WorkflowLog.of({
+                response: response.data,
+                eventIdList: [event.id],
+              }),
+            ]);
           });
 
         this.logger.log(`이벤트 ${event.id} 시작 리마인더 발송 완료`);

@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, Post } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { AppService } from "./app.service";
 
@@ -8,17 +8,18 @@ export class AppController {
 
   @Cron(CronExpression.EVERY_MINUTE)
   @Get()
-  public async runEventWorklow() {
-    await this.appService.runEventWorkflow();
+  public async fetchNewEvents() {
+    await this.appService.fetchNewEvents();
   }
 
+  @Post("/update-event-periods")
   public async updateEventPeriods() {
     await this.appService.updateEventPeriods();
   }
 
   @Cron(CronExpression.EVERY_MINUTE)
   public async runReportEventsWithPeriods() {
-    await this.appService.runReportEventsWithPeriods();
+    await this.appService.reportNewEvents();
   }
 
   @Cron("0 0 * * *")

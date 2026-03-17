@@ -8,16 +8,24 @@ import { WorkflowLog } from "./entity/workflow.log.entity";
 import { MessageHistory } from "./entity/message.history.entity";
 import { MessageReplyHistory } from "./entity/message.reply.history.entity";
 import { Event } from "../crawler/entity/event.entity";
+import axios from "axios";
 
 @Module({
-  imports: [MikroOrmModule.forFeature([WorkflowLog, MessageHistory, MessageReplyHistory, Event])],
+  imports: [
+    MikroOrmModule.forFeature([
+      WorkflowLog,
+      MessageHistory,
+      MessageReplyHistory,
+      Event,
+    ]),
+  ],
   providers: [
     WorkflowRunner,
     {
       provide: DI_SYMBOLS.WORKFLOW_HTTP_INSTANCE,
       useFactory: (config: ConfigService) =>
-        got.extend({
-          prefixUrl: config.getOrThrow("WORKFLOW_URL"),
+        axios.create({
+          baseURL: config.get("WORKFLOW_BASE_URL"),
         }),
       inject: [ConfigService],
     },

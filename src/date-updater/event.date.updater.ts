@@ -10,7 +10,6 @@ import { EventDetailRenderer } from "./renderer/event.detail.renderer";
 import { EventDetailTextExtractor } from "./text-extractor/event.detail.text.extractor";
 import { EventDateParser } from "./date-parser/date.parser.interface";
 import { DI_SYMBOLS } from "../common/constants/di-symbols";
-import { WorkflowLog } from "../runner/entity/workflow.log.entity";
 
 @Injectable()
 export class EventDateUpdater {
@@ -24,7 +23,6 @@ export class EventDateUpdater {
     private readonly textExtractor: EventDetailTextExtractor,
     @Inject(DI_SYMBOLS.EVENT_DATE_PARSER)
     private readonly dateParser: EventDateParser,
-    @InjectRepository(WorkflowLog)
   ) {}
 
   @CreateRequestContext()
