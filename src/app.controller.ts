@@ -6,8 +6,8 @@ import { AppService } from "./app.service";
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
-  @Get()
+  // @Cron(CronExpression.EVERY_MINUTE)
+  @Post("/fetch-new-events")
   public async fetchNewEvents() {
     await this.appService.fetchNewEvents();
   }
@@ -17,12 +17,12 @@ export class AppController {
     await this.appService.updateEventPeriods();
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  // @Cron(CronExpression.EVERY_MINUTE)
   public async runReportEventsWithPeriods() {
     await this.appService.reportNewEvents();
   }
 
-  @Cron("0 0 * * *")
+  // @Cron("0 0 * * *")
   public async sendEventStartReminders() {
     await this.appService.sendEventStartReminders();
   }

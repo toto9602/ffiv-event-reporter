@@ -13,8 +13,8 @@ import { EventDateUpdaterModule } from "./date-updater/event.date.updater.module
   imports: [
     ConfigModule.forRoot({
       envFilePath: path.join(
-        __dirname,
-        "../../env",
+        process.cwd(),
+        "env",
         `.${process.env.NODE_ENV}.env`,
       ),
       isGlobal: true,
