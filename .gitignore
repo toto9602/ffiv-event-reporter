@@ -65,3 +65,5 @@ event.http
 
 ## DB
 *.sqlite3
+
+migrations
