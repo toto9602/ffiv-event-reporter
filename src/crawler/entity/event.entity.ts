@@ -1,5 +1,11 @@
 import { BaseEntity } from "../../common/database/base.entity";
-import { Entity, Property } from "@mikro-orm/core";
+import { Entity, Enum, Property } from "@mikro-orm/core";
+
+export enum DateParseStatus {
+  NOT_PARSED = "NOT_PARSED",
+  SUCCESS = "SUCCESS",
+  FALLBACK = "FALLBACK",
+}
 
 interface CreateEventArgs {
   title: string;
@@ -30,6 +36,18 @@ export class Event extends BaseEntity {
   @Property({ type: "varchar", name: "banner_url" })
   bannerUrl: string;
 
+  @Property({ type: "datetime", name: "event_starts_at", nullable: true })
+  eventStartedAt: Date | null = null;
+
+  @Property({ type: "datetime", name: "event_ends_at", nullable: true })
+  eventEndedAt: Date | null = null;
+
+  @Property({ type: "varchar", name: "date_parse_status", nullable: true })
+  dateParseStatus: DateParseStatus | null = null;
+
+  @Property({ type: "datetime", name: "delivered_at", nullable: true })
+  deliveredAt: Date | null;
+
   public static of(args: CreateEventArgs): Event {
     const entity = new Event();
 
@@ -41,5 +59,23 @@ export class Event extends BaseEntity {
     entity.bannerUrl = args.bannerUrl;
 
     return entity;
+  }
+
+  public setParsedDates({
+    eventStartedAt,
+    eventEndedAt,
+  }: {
+    eventStartedAt: Date;
+    eventEndedAt: Date;
+  }): void {
+    this.eventStartedAt = eventStartedAt;
+    this.eventEndedAt = eventEndedAt;
+    this.dateParseStatus = DateParseStatus.SUCCESS;
+  }
+
+  public setFallbackDates(): void {
+    this.eventStartedAt = this.startDate;
+    this.eventEndedAt = this.endDate;
+    this.dateParseStatus = DateParseStatus.FALLBACK;
   }
 }

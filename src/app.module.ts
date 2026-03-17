@@ -7,6 +7,7 @@ import { RunnerModule } from "./runner/runner.module";
 import { AppService } from "./app.service";
 import { getMikroOrmModule } from "./common/database/getMikroOrmModule";
 import { ScheduleModule } from "@nestjs/schedule";
+import { EventDateUpdaterModule } from "./date-updater/event.date.updater.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     CrawlerModule,
     RunnerModule,
     ScheduleModule.forRoot(),
+    EventDateUpdaterModule,
   ],
   controllers: [AppController],
   providers: [AppService],
