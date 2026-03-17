@@ -6,10 +6,13 @@ export class EventDetailTextExtractor {
   public extract(html: string): string {
     const parsedText = convert(html);
 
-    return this.extractEventPeriodSnippet(parsedText, 10);
+    return this.extractEventPeriodSnippet(parsedText, 20);
   }
 
-  private extractEventPeriodSnippet(html: string, contextLength = 10): string {
+  private extractEventPeriodSnippet(
+    html: string,
+    contextLength: number,
+  ): string {
     const keyword = "이벤트 기간";
 
     const index = html.indexOf(keyword);
