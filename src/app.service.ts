@@ -11,18 +11,16 @@ export class AppService {
     private readonly eventDateUpdater: EventDateUpdater,
   ) {}
 
-  public async runEventWorkflow() {
-    const newEvents = await this.crawler.run();
-
-    await this.runner.runReportEvents(newEvents);
+  public async fetchNewEvents() {
+    await this.crawler.run();
   }
 
   public async updateEventPeriods() {
     await this.eventDateUpdater.run();
   }
 
-  public async runReportEventsWithPeriods() {
-    await this.runner.runForEventsWithPeriods();
+  public async reportNewEvents() {
+    await this.runner.reportNewEvents();
   }
 
   public async sendEventStartReminders() {

@@ -1,7 +1,7 @@
 import { BaseEntity } from "../../common/database/base.entity";
 import { Entity, Property } from "@mikro-orm/core";
 
-@Entity({ tableName: "message_reply_histories" })
+@Entity({ tableName: "message_reply_history" })
 export class MessageReplyHistory extends BaseEntity {
   @Property({ type: "datetime", name: "sent_at" })
   sentAt: Date;
