@@ -52,12 +52,15 @@ export class WorkflowRunner {
         const messageId: string =
           response.data?.messageId ?? String(response.data?.id ?? "");
 
+        const now = new Date();
         await this.messageHistoryRepository
           .getEntityManager()
           .transactional(async (em) => {
+            event.markAsDelivered(now);
+
             await em.persistAndFlush([
               MessageHistory.of({
-                sentAt: new Date(),
+                sentAt: now,
                 eventId: event.id,
                 messageId,
               }),
@@ -65,6 +68,7 @@ export class WorkflowRunner {
                 response: response.data,
                 eventIdList: [event.id],
               }),
+              event,
             ]);
           });
 

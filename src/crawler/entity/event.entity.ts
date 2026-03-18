@@ -79,4 +79,8 @@ export class Event extends BaseEntity {
     this.eventEndedAt = this.endDate;
     this.dateParseStatus = DateParseStatus.FALLBACK;
   }
+
+  public markAsDelivered(now: Date): void {
+    this.deliveredAt = now;
+  }
 }
