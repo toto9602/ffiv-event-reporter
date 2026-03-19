@@ -34,6 +34,10 @@ export class EventDateUpdater {
     });
 
     this.logger.log(`날짜 업데이트 대상 이벤트 ${events.length}건`);
+    if (events.length === 0) {
+      this.logger.log("날짜 업데이트 대상 이벤트가 없습니다.");
+      return;
+    }
 
     for (const event of events) {
       try {
