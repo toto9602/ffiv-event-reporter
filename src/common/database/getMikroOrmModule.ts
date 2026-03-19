@@ -17,5 +17,11 @@ export function getMikroOrmModule() {
       : [path.join(__dirname, "../../**/entity/*.entity.ts")],
     dbName: `${prefix}.sqlite3`,
     driver: SqliteDriver,
+    driverOptions: {
+      pragma: {
+        journal_mode: "WAL",
+        busy_timeout: 5000,
+      },
+    },
   });
 }
