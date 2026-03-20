@@ -1,5 +1,7 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@mikro-orm/nestjs";
+import { EntityRepository } from "@mikro-orm/core";
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
@@ -7,6 +9,7 @@ import { EventDateParser } from "./date.parser.interface";
 import { DI_SYMBOLS } from "../../common/constants/di-symbols";
 import { ParsedEventDate } from "./dto/parsed.event.date";
 import { SYSTEM_PROMPT } from "./prompts/system.prompt";
+import { LlmResponse } from "./entity/llm.response.entity";
 
 @Injectable()
 export class OpenAiEventDateParser implements EventDateParser {
@@ -32,6 +35,8 @@ export class OpenAiEventDateParser implements EventDateParser {
   constructor(
     @Inject(DI_SYMBOLS.LLM_CLIENT) private readonly client: OpenAI,
     private readonly configService: ConfigService,
+    @InjectRepository(LlmResponse)
+    private readonly llmResponseRepository: EntityRepository<LlmResponse>,
   ) {
     this.openAiModel = configService.getOrThrow("OPENAI_MODEL");
     this.systemPrompt = SYSTEM_PROMPT;
@@ -67,7 +72,7 @@ export class OpenAiEventDateParser implements EventDateParser {
         };
       }
 
-      return {
+      const result: ParsedEventDate = {
         eventStartedAt: parsed.event_started_at
           ? new Date(parsed.event_started_at)
           : null,
@@ -75,6 +80,14 @@ export class OpenAiEventDateParser implements EventDateParser {
           ? new Date(parsed.event_ended_at)
           : null,
       };
+
+      await this.llmResponseRepository
+        .getEntityManager()
+        .persistAndFlush(
+          LlmResponse.of({ request: rawText, response: parsed }),
+        );
+
+      return result;
     } catch (err) {
       this.logger.error("LLM 응답 파싱 중 오류 발생", err);
 

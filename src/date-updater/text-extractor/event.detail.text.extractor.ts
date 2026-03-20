@@ -6,7 +6,7 @@ export class EventDetailTextExtractor {
   public extract(html: string): string {
     const parsedText = convert(html);
 
-    return this.extractEventPeriodSnippet(parsedText, 20);
+    return this.extractEventPeriodSnippet(parsedText, 40);
   }
 
   private extractEventPeriodSnippet(

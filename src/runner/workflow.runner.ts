@@ -53,6 +53,8 @@ export class WorkflowRunner {
       try {
         const response = await this.axiosInstance.post(this.newEventEndpoint, {
           ...event,
+          startDate: event.eventStartedAt,
+          endDate: event.eventEndedAt,
         });
 
         const messageId: string =
@@ -111,9 +113,14 @@ export class WorkflowRunner {
     }
 
     for (const event of todayEvents) {
-      const history = await this.messageHistoryRepository.findOne({
-        eventId: event.id,
-      });
+      const history = await this.messageHistoryRepository.findOne(
+        {
+          eventId: event.id,
+        },
+        {
+          orderBy: { sentAt: "DESC" },
+        },
+      );
 
       if (!history) {
         this.logger.log(
