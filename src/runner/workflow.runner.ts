@@ -124,9 +124,6 @@ export class WorkflowRunner {
           },
         );
 
-        const replyMessageId: string =
-          response.data?.messageId ?? String(response.data?.id ?? "");
-
         await this.messageReplyHistoryRepository
           .getEntityManager()
           .transactional(async (em) => {
@@ -135,7 +132,6 @@ export class WorkflowRunner {
                 sentAt: new Date(),
                 eventId: event.id,
                 originalMessageId: history.externalMessageID,
-                replyMessageId,
               }),
               WorkflowLog.of({
                 response: response.data,
