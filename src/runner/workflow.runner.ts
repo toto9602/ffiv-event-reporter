@@ -6,7 +6,11 @@ import { InjectRepository } from "@mikro-orm/nestjs";
 import { WorkflowLog } from "./entity/workflow.log.entity";
 import { MessageHistory } from "./entity/message.history.entity";
 import { MessageReplyHistory } from "./entity/message.reply.history.entity";
-import { EntityRepository } from "@mikro-orm/core";
+import {
+  CreateRequestContext,
+  EntityRepository,
+  MikroORM,
+} from "@mikro-orm/core";
 import { AxiosInstance } from "axios";
 
 @Injectable()
@@ -17,6 +21,7 @@ export class WorkflowRunner {
   private readonly eventReplyEndpoint: string;
 
   constructor(
+    private readonly orm: MikroORM,
     @InjectRepository(MessageHistory)
     private readonly messageHistoryRepository: EntityRepository<MessageHistory>,
     @InjectRepository(MessageReplyHistory)
@@ -31,6 +36,7 @@ export class WorkflowRunner {
     this.eventReplyEndpoint = this.config.getOrThrow("EVENT_REPLY_ENDPOINT");
   }
 
+  @CreateRequestContext()
   public async reportNewEvents(): Promise<void> {
     const events = await this.eventRepository.find({
       eventStartedAt: { $ne: null },
@@ -81,6 +87,7 @@ export class WorkflowRunner {
     }
   }
 
+  @CreateRequestContext()
   public async sendEventStartReminders(): Promise<void> {
     const today = new Date();
     const startOfDay = new Date(
