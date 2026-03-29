@@ -10,7 +10,7 @@ export class EventDetailRenderer {
 
   async render(url: string): Promise<string> {
     const finalUrl = await this.toFinalUrl(url);
-    return this.tryRender(finalUrl, 1);
+    return await this.tryRender(finalUrl, 1);
   }
 
   private async tryRender(finalUrl: string, attempt: number): Promise<string> {
@@ -22,7 +22,10 @@ export class EventDetailRenderer {
     try {
       const page = await browser.newPage();
       try {
-        await page.goto(finalUrl, { waitUntil: "networkidle2", timeout: 30000 });
+        await page.goto(finalUrl, {
+          waitUntil: "networkidle2",
+          timeout: 30000,
+        });
         return await page.content();
       } finally {
         await page.close();
@@ -30,7 +33,7 @@ export class EventDetailRenderer {
     } catch (e) {
       this.logger.warn(`렌더링 실패 (${attempt}/${MAX_ATTEMPTS}): ${e}`);
       if (attempt >= MAX_ATTEMPTS) throw e;
-      return this.tryRender(finalUrl, attempt + 1);
+      return await this.tryRender(finalUrl, attempt + 1);
     } finally {
       await browser.close();
     }
