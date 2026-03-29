@@ -2,11 +2,11 @@ import { Injectable, Logger } from "@nestjs/common";
 import axios from "axios";
 import puppeteer from "puppeteer";
 
-const MAX_ATTEMPTS = 3;
-
 @Injectable()
 export class EventDetailRenderer {
   private readonly logger = new Logger(EventDetailRenderer.name);
+
+  private readonly MAX_ATTEMPTS = 3;
 
   async render(url: string): Promise<string> {
     const finalUrl = await this.toFinalUrl(url);
@@ -31,8 +31,8 @@ export class EventDetailRenderer {
         await page.close();
       }
     } catch (e) {
-      this.logger.warn(`렌더링 실패 (${attempt}/${MAX_ATTEMPTS}): ${e}`);
-      if (attempt >= MAX_ATTEMPTS) throw e;
+      this.logger.warn(`렌더링 실패 (${attempt}/${this.MAX_ATTEMPTS}): ${e}`);
+      if (attempt >= this.MAX_ATTEMPTS) throw e;
       return await this.tryRender(finalUrl, attempt + 1);
     } finally {
       await browser.close();
