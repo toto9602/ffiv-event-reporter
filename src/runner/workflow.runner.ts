@@ -50,6 +50,15 @@ export class WorkflowRunner {
     }
 
     for (const event of events) {
+      const fresh = await this.eventRepository.findOne(
+        { id: event.id, deliveredAt: null },
+        { refresh: true },
+      );
+      if (!fresh) {
+        this.logger.warn(`이벤트 ${event.id} 이미 발송됨, 건너뜁니다.`);
+        continue;
+      }
+
       try {
         const response = await this.axiosInstance.post(this.newEventEndpoint, {
           ...event,
