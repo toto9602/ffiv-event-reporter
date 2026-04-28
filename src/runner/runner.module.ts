@@ -26,6 +26,7 @@ import axios from "axios";
       useFactory: (config: ConfigService) =>
         axios.create({
           baseURL: config.get("WORKFLOW_BASE_URL"),
+          timeout: 10000,
         }),
       inject: [ConfigService],
     },
