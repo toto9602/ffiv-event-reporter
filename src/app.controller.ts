@@ -27,8 +27,8 @@ export class AppController {
     await this.appService.reportNewEvents();
   }
 
-  // 매일 00:00:10: 당일 시작 이벤트 리마인더 발송
-  @Cron("10 0 0 * * *")
+  // 매일 19:00:00: 당일 시작 이벤트 리마인더 발송
+  @Cron("0 0 19 * * *")
   @Post("/event-remind")
   public async sendEventStartReminders() {
     await this.appService.sendEventStartReminders();
