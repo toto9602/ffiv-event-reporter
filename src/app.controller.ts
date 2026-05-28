@@ -20,8 +20,8 @@ export class AppController {
     await this.appService.updateEventPeriods();
   }
 
-  // 매분 20초: 기간이 설정된 이벤트 알림 발송 (fetchNewEvents와 충돌 방지를 위해 20초 오프셋)
-  @Cron("20 * * * * *")
+  // 매 2분 20초: 기간이 설정된 이벤트 알림 발송 (fetchNewEvents와 충돌 방지를 위해 20초 오프셋)
+  @Cron("20 */2 * * * *")
   @Post("/report-new-events")
   public async runReportEventsWithPeriods() {
     await this.appService.reportNewEvents();
