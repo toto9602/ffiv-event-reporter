@@ -17,6 +17,8 @@ import { AxiosInstance } from "axios";
 export class WorkflowRunner {
   private readonly logger = new Logger(WorkflowRunner.name);
 
+  private readonly processingIds = new Set<number>();
+
   private readonly newEventEndpoint: string;
   private readonly eventReplyEndpoint: string;
 
@@ -50,6 +52,11 @@ export class WorkflowRunner {
     }
 
     for (const event of events) {
+      if (this.processingIds.has(event.id)) {
+        this.logger.warn(`이벤트 ${event.id} 처리 중, 건너뜁니다.`);
+        continue;
+      }
+
       const fresh = await this.eventRepository.findOne(
         { id: event.id, deliveredAt: null },
         { refresh: true },
@@ -59,6 +66,7 @@ export class WorkflowRunner {
         continue;
       }
 
+      this.processingIds.add(event.id);
       try {
         const response = await this.axiosInstance.post(this.newEventEndpoint, {
           ...event,
@@ -94,6 +102,8 @@ export class WorkflowRunner {
         );
       } catch (e: any) {
         this.logger.error(`이벤트 ${event.id} 기간 알림 발송 중 오류 발생`, e);
+      } finally {
+        this.processingIds.delete(event.id);
       }
     }
   }
