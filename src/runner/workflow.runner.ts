@@ -67,6 +67,9 @@ export class WorkflowRunner {
       }
 
       this.processingIds.add(event.id);
+      this.logger.log(
+        `processingIds에 이벤트 ${event.id} 추가, 현재 processingIds: ${[...this.processingIds]}`,
+      );
       try {
         const response = await this.axiosInstance.post(this.newEventEndpoint, {
           ...event,
