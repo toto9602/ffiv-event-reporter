@@ -107,6 +107,9 @@ export class WorkflowRunner {
         this.logger.error(`이벤트 ${event.id} 기간 알림 발송 중 오류 발생`, e);
       } finally {
         this.processingIds.delete(event.id);
+        this.logger.log(
+          `processingIds에서 이벤트 ${event.id} 제거, 현재 processingIds: ${[...this.processingIds]}`,
+        );
       }
     }
   }
